@@ -17,26 +17,22 @@ export const setupQueueProcessor = async (queueName: string) => {
   });
   await queueScheduler.waitUntilReady();
 
-  /**
-   * This is a dummy worker set up to demonstrate job progress and to
-   * randomly fail jobs to demonstrate the UI.
-   *
-   * In a real application, you would want to set up a worker that
-   * actually does something useful.
-   */
-
   new Worker(
     queueName,
     async (job) => {
-      for (let i = 0; i <= 100; i++) {
-        await job.updateProgress(i);
-        await job.log(`Processing job at interval ${i}`);
+      console.log(
+        `Processing job ${job.id} [${job.name}]: ${job.data?.eventType || 'unknown'}`
+      );
 
-        if (Math.random() * 200 < 1) throw new Error(`Random error ${i}`);
-      }
+      // TODO: Add actual insights processing logic here
+      // For now, log the event and mark as complete
+      console.log(`Job ${job.id} data:`, JSON.stringify(job.data));
 
-      return { jobId: `This is the return value of job (${job.id})` };
+      return { jobId: job.id, status: 'processed' };
     },
-    { connection }
+    {
+      connection,
+      concurrency: 5,
+    }
   );
 };

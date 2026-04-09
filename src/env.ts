@@ -5,6 +5,9 @@ export const env = envsafe({
   REDISPORT: port(),
   REDISUSER: str(),
   REDISPASSWORD: str(),
+  QUEUE_API_TOKEN: str({
+    desc: 'Bearer token for authenticating queue publish requests',
+  }),
   PORT: port({
     devDefault: 3000,
   }),
