@@ -27,9 +27,7 @@ const run = async () => {
   });
 
   await server.listen({ port: env.PORT, host: '0.0.0.0' });
-  console.log(
-    `Queue worker running. Dashboard at https://${env.RAILWAY_STATIC_URL}/`
-  );
+  console.log(`Queue worker running on port ${env.PORT}`);
 };
 
 run().catch((e) => {
