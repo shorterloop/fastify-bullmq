@@ -6,6 +6,8 @@ export const env = envsafe({
   REDISPORT: port({ default: 6379 }),
   REDISUSER: str({ default: '' }),
   REDISPASSWORD: str({ default: '' }),
+  DASHBOARD_USER: str(),
+  DASHBOARD_PASSWORD: str(),
   PORT: port({
     devDefault: 3000,
   }),
