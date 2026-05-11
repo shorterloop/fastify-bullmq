@@ -9,8 +9,15 @@ import { env } from './env';
 import { createQueue, setupQueueProcessor } from './queue';
 
 const run = async () => {
-  const insightsQueue = createQueue('insights-ingestion');
-  await setupQueueProcessor(insightsQueue.name);
+  const queueNames = env.QUEUENAMES.split(',').map((q) => q.trim()).filter(Boolean);
+  const queues = queueNames.flatMap((name) => [
+    createQueue(name),
+    createQueue(`${name}_dlq`),
+  ]);
+
+  for (const name of queueNames) {
+    await setupQueueProcessor(name);
+  }
 
   const server: FastifyInstance<Server, IncomingMessage, ServerResponse> =
     fastify();
@@ -34,7 +41,7 @@ const run = async () => {
   // Bull Board dashboard for monitoring queues
   const serverAdapter = new FastifyAdapter();
   createBullBoard({
-    queues: [new BullMQAdapter(insightsQueue)],
+    queues: queues.map((q) => new BullMQAdapter(q)),
     serverAdapter,
   });
   serverAdapter.setBasePath('/');

@@ -8,6 +8,7 @@ export const env = envsafe({
   REDISPASSWORD: str({ default: '' }),
   DASHBOARD_USER: str(),
   DASHBOARD_PASSWORD: str(),
+  QUEUENAMES: str({ default: 'insights-ingestion' }),
   PORT: port({
     devDefault: 3000,
   }),
