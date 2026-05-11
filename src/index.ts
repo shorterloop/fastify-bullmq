@@ -1,7 +1,6 @@
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { FastifyAdapter } from '@bull-board/fastify';
-import basicAuth from '@fastify/basic-auth';
 import fastify, { FastifyInstance } from 'fastify';
 import { Server, IncomingMessage, ServerResponse } from 'http';
 import { env } from './env';
@@ -22,21 +21,21 @@ const run = async () => {
   const server: FastifyInstance<Server, IncomingMessage, ServerResponse> =
     fastify();
 
-  await server.register(basicAuth, {
-    validate(username, password, _req, _reply, done) {
-      if (
-        username === env.DASHBOARD_USER &&
-        password === env.DASHBOARD_PASSWORD
-      ) {
-        done();
-      } else {
-        done(new Error('Unauthorized'));
+  server.addHook('onRequest', async (request, reply) => {
+    const auth = request.headers.authorization;
+    if (auth && auth.startsWith('Basic ')) {
+      const [username, password] = Buffer.from(auth.slice(6), 'base64')
+        .toString()
+        .split(':');
+      if (username === env.DASHBOARD_USER && password === env.DASHBOARD_PASSWORD) {
+        return;
       }
-    },
-    authenticate: { realm: 'Bull Board' },
+    }
+    reply
+      .header('WWW-Authenticate', 'Basic realm="Bull Board"')
+      .code(401)
+      .send({ error: 'Unauthorized' });
   });
-
-  server.addHook('onRequest', server.basicAuth);
 
   // Bull Board dashboard for monitoring queues
   const serverAdapter = new FastifyAdapter();
