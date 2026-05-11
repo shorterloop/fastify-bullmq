@@ -5,7 +5,7 @@ import fastify, { FastifyInstance } from 'fastify';
 import { Server, IncomingMessage, ServerResponse } from 'http';
 import { env } from './env';
 
-import { createQueue, setupQueueProcessor } from './queue';
+import { createQueue } from './queue';
 
 const run = async () => {
   const queueNames = env.QUEUENAMES.split(',').map((q) => q.trim()).filter(Boolean);
@@ -14,9 +14,7 @@ const run = async () => {
     createQueue(`${name}_dlq`),
   ]);
 
-  for (const name of queueNames) {
-    await setupQueueProcessor(name);
-  }
+
 
   const server: FastifyInstance<Server, IncomingMessage, ServerResponse> =
     fastify();
