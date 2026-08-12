@@ -1,8 +1,7 @@
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { FastifyAdapter } from '@bull-board/fastify';
-import fastify, { FastifyInstance } from 'fastify';
-import { Server, IncomingMessage, ServerResponse } from 'http';
+import fastify from 'fastify';
 import { env } from './env';
 
 import { createQueue } from './queue';
@@ -16,8 +15,7 @@ const run = async () => {
 
 
 
-  const server: FastifyInstance<Server, IncomingMessage, ServerResponse> =
-    fastify();
+  const server = fastify({ http2: true });
 
   server.addHook('onRequest', async (request, reply) => {
     const auth = request.headers.authorization;
