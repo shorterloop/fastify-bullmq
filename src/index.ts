@@ -15,7 +15,7 @@ const run = async () => {
 
 
 
-  const server = fastify({ http2: true });
+  const server = fastify();
 
   server.addHook('onRequest', async (request, reply) => {
     const auth = request.headers.authorization;
@@ -53,3 +53,4 @@ run().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+
